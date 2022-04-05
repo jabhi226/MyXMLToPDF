@@ -1,20 +1,19 @@
 package com.example.myxmltopdf
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.*
 import android.graphics.pdf.PdfDocument
-import android.graphics.pdf.PdfDocument.PageInfo
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,13 +24,7 @@ import com.itextpdf.text.Rectangle
 import com.itextpdf.text.pdf.PdfWriter
 import java.io.*
 
-
-//val permissions = arrayOf(
-//    Manifest.permission.READ_EXTERNAL_STORAGE,
-//    Manifest.permission.WRITE_EXTERNAL_STORAGE
-//)
-
-class MainActivity : AppCompatActivity() {
+class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -76,13 +69,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun getList(): ArrayList<String> {
         val list = ArrayList<String>()
-        for (i in 0..100) {
+        for (i in 0..50) {
             list.add(i.toString())
         }
         return list
     }
 
-    var dirpath: String? = null
+    private var dirpath: String? = null
     private fun layoutToImage(view: View) {
         val relativeLayout = view as RelativeLayout
         relativeLayout.isDrawingCacheEnabled = true
@@ -119,18 +112,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun doInBackground() {
+    private fun doInBackground() {
         val document = PdfDocument()
         try {
             val file = File(
                 ContextWrapper(applicationContext).getDir(
                     "XML",
-                    Context.MODE_PRIVATE
+                    MODE_PRIVATE
                 ).absolutePath + "image.jpg"
             )
 
             val bitmap = BitmapFactory.decodeFile(file.absolutePath)
-            val pageInfo = PageInfo.Builder(bitmap.width, bitmap.height, 1).create()
+            val pageInfo =
+                PdfDocument.PageInfo.Builder(bitmap.width, bitmap.height, 1)
+                    .create()
             val page = document.startPage(pageInfo)
             val canvas = page.canvas
             val paint = Paint()
@@ -142,7 +137,7 @@ class MainActivity : AppCompatActivity() {
             val pdfFile = File(
                 ContextWrapper(applicationContext).getDir(
                     "XML",
-                    Context.MODE_PRIVATE
+                    MODE_PRIVATE
                 ).absolutePath + System.currentTimeMillis().toString() + ".pdf"
             )
             document.writeTo(FileOutputStream(pdfFile))
